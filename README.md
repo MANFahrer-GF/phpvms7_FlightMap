@@ -23,6 +23,14 @@ dark basemap.
 No flown ACARS tracks are loaded — the map draws clean A→B great-circle lines, so it
 stays fast even with thousands of routes.
 
+## Screenshots
+
+| My flights | All flights (+ pilot filter) |
+|:---:|:---:|
+| ![My flights](docs/my-flights.jpg) | ![All flights](docs/all-flights.jpg) |
+| **Click an airport → departures & arrivals** | **Aircraft locations** |
+| ![Airport connections](docs/connections.jpg) | ![Aircraft](docs/aircraft.jpg) |
+
 ## Requirements
 
 - phpVMS 7
