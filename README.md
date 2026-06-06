@@ -34,13 +34,30 @@ stays fast even with thousands of routes.
 
 ## Installation
 
-1. Copy the `FlightMap` folder into your phpVMS `modules/` directory.
-2. Enable it:
+**Download:** grab `phpvms7_FlightMap-vX.Y.Z.zip` from the
+[**latest release**](https://github.com/MANFahrer-GF/phpvms7_FlightMap/releases/latest).
+The ZIP contains a single top-level `FlightMap/` folder.
+
+### Option A — module installer (recommended)
+
+If your phpVMS install has a module installer that accepts ZIP uploads
+(e.g. ModuleCenter), just upload `phpvms7_FlightMap-vX.Y.Z.zip` there. It drops the
+`FlightMap/` folder into `modules/` automatically. Then enable it (next step) if it
+isn't enabled already.
+
+### Option B — manual
+
+1. Unzip the archive and copy the `FlightMap/` folder into your phpVMS `modules/`
+   directory (so you end up with `modules/FlightMap/`).
+2. Enable it and clear the view cache:
    ```bash
    php artisan module:enable FlightMap
    php artisan view:clear
    ```
 3. Open **`/flightmap`** (the route is behind `auth`).
+
+> The folder **must** be named `FlightMap` (it maps to the `Modules\FlightMap`
+> namespace). Don't rename it.
 
 ### Add it to your navigation
 
