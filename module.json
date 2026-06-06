@@ -1,7 +1,7 @@
 {
     "name": "FlightMap",
     "alias": "flightmap",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "GSG Flugkarte: meine Routen, alle Routen (mit Piloten-Filter) und aktuelle Flugzeug-Standorte. Gerade Direktlinien (Geodaeten), keine geflogenen Tracks.",
     "keywords": [
         "phpvms",

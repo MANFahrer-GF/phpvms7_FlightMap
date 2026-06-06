@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Flugkarte')
+@section('title', __('flightmap::messages.title'))
 
 @section('css')
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -58,13 +58,13 @@
   <div class="fm-card mb-10">
     <div class="fm-card-header">
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-        <div class="fm-title"><i class="ph-fill ph-map-trifold"></i>Flugkarte</div>
+        <div class="fm-title"><i class="ph-fill ph-map-trifold"></i>@lang('flightmap::messages.title')</div>
         <span id="fm-info" class="fm-info"></span>
       </div>
       <div class="fm-toolbar">
-        <button id="fm-mode-my" type="button" class="fm-pill active"><i class="ph-fill ph-airplane-tilt"></i>Meine Flüge</button>
-        <button id="fm-mode-all" type="button" class="fm-pill"><i class="ph-fill ph-globe-hemisphere-west"></i>Alle Flüge</button>
-        <button id="fm-mode-aircraft" type="button" class="fm-pill"><i class="ph-fill ph-airplane"></i>Flugzeuge</button>
+        <button id="fm-mode-my" type="button" class="fm-pill active"><i class="ph-fill ph-airplane-tilt"></i>@lang('flightmap::messages.my_flights')</button>
+        <button id="fm-mode-all" type="button" class="fm-pill"><i class="ph-fill ph-globe-hemisphere-west"></i>@lang('flightmap::messages.all_flights')</button>
+        <button id="fm-mode-aircraft" type="button" class="fm-pill"><i class="ph-fill ph-airplane"></i>@lang('flightmap::messages.aircraft')</button>
         <select id="fm-pilot" class="fm-select" style="display:none"></select>
       </div>
     </div>
@@ -85,6 +85,21 @@
       const pilotSel = document.getElementById('fm-pilot');
       const ROUTE_COLOR = '#22d3ee', OUT_COLOR = '#34d399', IN_COLOR = '#f59e0b', DIM_COLOR = '#475569';
       const DAIRCRAFT_BASE = '{{ url('/daircraft') }}';
+
+      // i18n strings (resolved server-side; locale follows the pilot's phpVMS language)
+      const T = {
+        loading:      @json(__('flightmap::messages.loading')),
+        routes:       @json(__('flightmap::messages.routes')),
+        airports:     @json(__('flightmap::messages.airports')),
+        clickHint:    @json(__('flightmap::messages.click_hint')),
+        click:        @json(__('flightmap::messages.click')),
+        aircraftWord: @json(__('flightmap::messages.aircraft_word')),
+        aircraftUnit: @json(__('flightmap::messages.aircraft_unit')),
+        departuresTo: @json(__('flightmap::messages.departures_to')),
+        arrivalsFrom: @json(__('flightmap::messages.arrivals_from')),
+        none:         @json(__('flightmap::messages.none')),
+        allPilots:    @json(__('flightmap::messages.all_pilots')),
+      };
 
       let routeLayers = [], airportMarkers = {}, currentAirports = {}, highlightActive = false;
 
@@ -111,12 +126,12 @@
         apts.forEach(a => {
           currentAirports[a.icao] = a;
           const m = leaflet.circleMarker([a.lat, a.lon], { radius: 5, color: '#0b0f17', weight: 1, fillColor: ROUTE_COLOR, fillOpacity: 1, bubblingMouseEvents: false });
-          m.bindTooltip(esc(a.icao) + ' — ' + esc(a.name) + ' · klicken', { className: 'fm-tt' });
+          m.bindTooltip(esc(a.icao) + ' — ' + esc(a.name) + ' · ' + T.click, { className: 'fm-tt' });
           m.on('click', () => highlightAirport(a.icao));
           m.addTo(layerNodes);
           airportMarkers[a.icao] = m;
         });
-        info.textContent = lines.length + ' Strecken · ' + apts.length + ' Flughäfen · auf Flughafen klicken für Verbindungen';
+        info.textContent = lines.length + ' ' + T.routes + ' · ' + apts.length + ' ' + T.airports + ' · ' + T.clickHint;
         fitNodes();
       }
 
@@ -143,12 +158,12 @@
         });
         dests.sort((a, b) => b.count - a.count); origins.sort((a, b) => b.count - a.count);
         const row = (x, dir) => '<div class="fm-conn"><span class="i ' + dir + '">' + esc(x.icao) + '</span><span class="nm">' + esc(aptName(x.icao)) + '</span><span class="c">' + x.count + '×</span></div>';
-        const destHtml = dests.length ? dests.map(x => row(x, 'out')).join('') : '<div class="fm-empty">keine</div>';
-        const origHtml = origins.length ? origins.map(x => row(x, 'in')).join('') : '<div class="fm-empty">keine</div>';
+        const destHtml = dests.length ? dests.map(x => row(x, 'out')).join('') : '<div class="fm-empty">' + T.none + '</div>';
+        const origHtml = origins.length ? origins.map(x => row(x, 'in')).join('') : '<div class="fm-empty">' + T.none + '</div>';
         const apt = currentAirports[icao] || { icao: icao };
         const html = '<div class="fm-pop-h">' + esc(apt.icao) + ' <span class="fm-ac-type">' + esc(apt.name || '') + '</span></div>'
-          + '<div class="fm-conn-sec"><div class="fm-conn-h out">▸ Abflüge nach (' + dests.length + ')</div><div class="fm-conn-list">' + destHtml + '</div></div>'
-          + '<div class="fm-conn-sec"><div class="fm-conn-h in">◂ Ankünfte aus (' + origins.length + ')</div><div class="fm-conn-list">' + origHtml + '</div></div>';
+          + '<div class="fm-conn-sec"><div class="fm-conn-h out">▸ ' + T.departuresTo + ' (' + dests.length + ')</div><div class="fm-conn-list">' + destHtml + '</div></div>'
+          + '<div class="fm-conn-sec"><div class="fm-conn-h in">◂ ' + T.arrivalsFrom + ' (' + origins.length + ')</div><div class="fm-conn-list">' + origHtml + '</div></div>';
         const m = airportMarkers[icao];
         m.unbindPopup(); m.bindPopup(html, { minWidth: 250, maxWidth: 310 }).openPopup();
       }
@@ -180,10 +195,10 @@
           }).join('');
           const html = '<div class="fm-pop-h">' + esc(a.icao) + ' <span class="fm-ac-type">' + esc(a.name) + '</span> <span class="cnt">' + a.count + '</span></div><div class="fm-ac-list">' + rows + '</div>';
           m.bindPopup(html, { minWidth: 250, maxWidth: 300 });
-          m.bindTooltip('<b>' + esc(a.icao) + '</b> · ' + a.count + ' Flugzeug(e)', { className: 'fm-tt' });
+          m.bindTooltip('<b>' + esc(a.icao) + '</b> · ' + a.count + ' ' + T.aircraftUnit, { className: 'fm-tt' });
           m.addTo(layerNodes);
         });
-        info.textContent = arr.length + ' Flughäfen · ' + arr.reduce((s, a) => s + a.count, 0) + ' Flugzeuge';
+        info.textContent = arr.length + ' ' + T.airports + ' · ' + arr.reduce((s, a) => s + a.count, 0) + ' ' + T.aircraftWord;
         fitNodes();
       }
 
@@ -191,14 +206,14 @@
       function setMode(mode) {
         setActiveButton(mode);
         pilotSel.style.display = (mode === 'all') ? '' : 'none';
-        info.textContent = 'Lädt…';
+        info.textContent = T.loading;
         if (mode === 'my') { req('/flightmap/my').then(drawRoutes); }
         else if (mode === 'all') { const q = pilotSel.value ? ('?pilot=' + encodeURIComponent(pilotSel.value)) : ''; req('/flightmap/all' + q).then(drawRoutes); }
         else { req('/flightmap/aircraft').then(drawAircraft); }
       }
 
       req('/flightmap/pilots').then(d => {
-        const opts = ['<option value="" selected>Alle Piloten</option>'].concat(((d && d.data) || []).map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>'));
+        const opts = ['<option value="" selected>' + T.allPilots + '</option>'].concat(((d && d.data) || []).map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>'));
         pilotSel.innerHTML = opts.join('');
         pilotSel.addEventListener('change', () => setMode('all'));
       });

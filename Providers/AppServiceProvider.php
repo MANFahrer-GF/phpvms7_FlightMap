@@ -12,8 +12,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->moduleSvc = app(ModuleService::class);
+        $this->registerTranslations();
         $this->registerViews();
         $this->registerLinks();
+    }
+
+    public function registerTranslations(): void
+    {
+        // Enables __('flightmap::messages.*'); locale follows the pilot's phpVMS
+        // language setting, with English as the fallback.
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'flightmap');
     }
 
     public function registerLinks(): void
@@ -21,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         // Member-only frontend link. On the SPTheme the entry is also placed
         // manually under the SkyOps group in sidebar.blade.php; this registration
         // keeps a link for the Seven/Beta fallback themes.
-        $this->moduleSvc->addFrontendLink('Flugkarte', '/flightmap', 'ph-fill ph-map-trifold', true);
+        $this->moduleSvc->addFrontendLink(__('flightmap::messages.title'), '/flightmap', 'ph-fill ph-map-trifold', true);
     }
 
     public function registerViews(): void

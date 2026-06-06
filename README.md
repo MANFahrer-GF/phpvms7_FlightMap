@@ -76,6 +76,14 @@ Seven/Beta themes. For custom themes, add a link to `/flightmap` wherever you li
 <a href="{{ url('/flightmap') }}"><i class="..."></i> Flight Map</a>
 ```
 
+## Languages
+
+Fully localized via Laravel translations — ships with **English** 🇬🇧 and
+**German** 🇩🇪 (`Resources/lang/en` / `Resources/lang/de`). The language follows
+each pilot's phpVMS setting, with English as the fallback. To add another language,
+copy `Resources/lang/en/messages.php` to `Resources/lang/<locale>/messages.php` and
+translate the values.
+
 ## How it works
 
 | Part | File |
